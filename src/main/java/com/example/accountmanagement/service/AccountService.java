@@ -1,6 +1,7 @@
 package com.example.accountmanagement.service;
 
 import com.example.accountmanagement.domain.Account;
+import com.example.accountmanagement.domain.AccountStatus;
 import com.example.accountmanagement.domain.AccountUser;
 import com.example.accountmanagement.dto.AccountDTO;
 import com.example.accountmanagement.exception.AccountException;
@@ -52,5 +53,35 @@ public class AccountService {
     @Transactional
     public Account getAccount(Long id) {
         return accountRepository.findById(id).get();
+    }
+
+    @Transactional
+    public AccountDTO deleteAccount(Long userId, String accountNumber) {
+        AccountUser accountUser = accountUserRepository.findById(userId)
+                .orElseThrow(() -> new AccountException(ErrorCode.USER_NOT_FOUND));
+
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AccountException(ErrorCode.ACCOUNT_NOT_FOUND));
+
+        validateDeleteAccount(accountUser, account);
+
+        account.setAccountStatus(AccountStatus.UNREGISTERED);
+        account.setUnRegisteredAt(LocalDateTime.now());
+
+        accountRepository.save(account);
+
+        return AccountDTO.fromEntity(account);
+    }
+
+    private void validateDeleteAccount(AccountUser accountUser, Account account) {
+        if(!accountUser.equals(account.getAccountUser())) {
+            throw new AccountException(ErrorCode.USER_ACCOUNT_UN_MATCH);
+        }
+        if(account.getAccountStatus() == AccountStatus.UNREGISTERED) {
+            throw new AccountException(ErrorCode.ACCOUNT_ALREADY_UNREGISTERED);
+        }
+        if(account.getBalance() > 0) {
+            throw new AccountException(ErrorCode.BALANCE_NOT_EMPTY);
+        }
     }
 }

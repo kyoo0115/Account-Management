@@ -2,6 +2,7 @@ package com.example.accountmanagement.controller;
 
 import com.example.accountmanagement.domain.Account;
 import com.example.accountmanagement.dto.CreateAccount;
+import com.example.accountmanagement.dto.DeleteAccount;
 import com.example.accountmanagement.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,19 @@ public class AccountController {
                 accountService.createAccount(
                     request.getUserId(),
                     request.getInitialBalance()
+                )
+        );
+    }
+
+    @DeleteMapping("/account")
+    public DeleteAccount.Response deleteAccount(
+            @RequestBody @Valid DeleteAccount.Request request
+    ) {
+
+        return DeleteAccount.Response.from(
+                accountService.deleteAccount(
+                        request.getUserId(),
+                        request.getAccountNumber()
                 )
         );
     }
