@@ -20,7 +20,7 @@ public class AccountController {
     @PostMapping("/account")
     public CreateAccount.Response createAccount(
             @RequestBody @Valid CreateAccount.Request request
-            ) {
+    ) {
 
         return CreateAccount.Response.from(
                 accountService.createAccount(
@@ -46,7 +46,7 @@ public class AccountController {
     @GetMapping("/account")
     public List<AccountInfo> getAccountsByUserId(
         @RequestParam("user_id") Long userId
-    ){
+    ) {
         return accountService.getAccountsByUserId(userId)
                 .stream().map(accountDTO ->
                         AccountInfo.builder()
