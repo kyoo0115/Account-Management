@@ -2,26 +2,27 @@ package com.example.accountmanagement.config;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import redis.embedded.RedisServer;
 
-@TestConfiguration
+@Configuration
 public class LocalRedisConfig {
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
 
-    private final RedisServer redisServer;
-
-    public LocalRedisConfig(RedisProperties redisProperties) {
-        this.redisServer = new RedisServer(redisProperties.getRedisPort());
-    }
+    private RedisServer redisServer;
 
     @PostConstruct
-    public void postConstruct() {
+    public void startRedis() {
+        redisServer = new RedisServer(redisPort);
         redisServer.start();
     }
 
     @PreDestroy
-    public void preDestroy() {
-        redisServer.stop();
+    public void stopRedis() {
+        if(redisServer != null) {
+            redisServer.stop();
+        }
     }
 }
