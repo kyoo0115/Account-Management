@@ -1,5 +1,11 @@
 package com.example.accountmanagement.aop;
 
-public @interface AccountLock {
+import java.lang.annotation.*;
 
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@Inherited
+public @interface AccountLock {
+    long tryLockTime() default 5000L;
 }
